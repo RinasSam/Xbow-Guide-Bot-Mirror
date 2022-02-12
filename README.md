@@ -1,6 +1,5 @@
-# Xbow Guide Bot: The Free and Open Source Xbow Matchup Guides Discord Bot.
+# Xbow Guide Bot: The Free and Open Source Xbow Matchup Guides Discord Bot.  ![LICENSE](AGPLv3.svg)  
   
-![LICENSE](AGPLv3.svg)  
     
 	
 This is the official Xbow Guide Bot repository. It should be a fossil repository, if you see this on github/gitlab, then it has been mirrored from the original repository.  
