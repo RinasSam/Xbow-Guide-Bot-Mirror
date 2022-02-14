@@ -1,4 +1,7 @@
 # 
+# Makefile: utility makefile to perform some repetitive tasks quickly.
+# This file may not be needed, but it is a nice utility to have =).
+#
 # This file is part of Xbow Guide Bot: The Free and Open Source Xbow Matchup Guides Discord Bot.
 # Copyright (C) 2022 RinasSam.
 # 
@@ -19,3 +22,12 @@
 # 	Email:		samkhaldoon2006@gmail.com
 # 	Discord:	RinasSam#0931
 #
+
+
+# 
+# Mirror: Uses fossil's mirroring capabilities to mirror the repostory to git and push it to 
+# github <https://github.com/RinasSam/Xbow-Guide-Bot-Mirror>.
+#
+
+mirror: ../XGB-git/
+	fossil git export $< -f -v
