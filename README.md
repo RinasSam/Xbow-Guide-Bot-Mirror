@@ -9,5 +9,5 @@ The Xbow Guide Bot is a Discord bot I created so that Xbow players could upload 
 The bot is written in Javascript using Discord.js, and is licensed under the [GNU Affero General Public License (AGPL) V3](./LICENSE).  
 The guides are in a separate github [repository](https://github.com/RinasSam/Xbow-Matchup-Guides).  
   
-![LICENSE](AGPLv3.svg) 
+![](AGPLv3.svg) 
 

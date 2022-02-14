@@ -1,137 +1,126 @@
-//Copyright RinasSam 2022
-//Copying the code and using it in your own bots is prohibited.
+/*
+ * index.js: the main code of the Xbow Guide Bot.
+ *
+ * This file is part of Xbow Guide Bot: The Free and Open Source Xbow Matchup Guides Discord Bot.
+ * Copyright (C) 2022 RinasSam.
+ * 
+ * Xbow Guide Bot is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * 
+ * Xbow Guide Bot is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * 
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * 
+ * Author contact information:
+ * 	Email:		samkhaldoon2006@gmail.com
+ * 	Discord:	RinasSam#0931
+ */
+ 
+
+/*
+ * The following code that the bot keep running by opening a port. 
+ * Uptimerobot <https://uptimerobot.com/> pings the bot every 5 minutes to ensure is keeps running.
+ *
+ * This code is only for REPL <https://www.repl.it>. You can remove it if you need to.
+ */
+
 
 const express = require('express');
 const app = express();
-const fs = require('fs');
-const guideFolder = './Xbow-Matchup-Guides/Guides';
-var stopc = 0;
 const port = 3000;
-function replaceAll(str, find, replace) {
-  var escapedFind = find.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
-  return str.replace(new RegExp(escapedFind, 'g'), replace);
-}
-
-function search_word(text, word){
-    
-    var x = 0, y=0;
-   
-    for (i=0;i< text.length;i++)
-        {
-        if(text[i] == word[0])
-            {
-            for(j=i;j< i+word.length;j++)
-               {
-                if(text[j]==word[j-i])
-                  {
-                    y++;
-                  }
-                if (y==word.length){
-                    x++;
-                }
-            }
-            y=0;
-        }
-    }
-   if(x === 0)
-   {
-     return false;
-   }
-   return true;
-}
+app.get('/', (req, res) => res.send('Hello RinasSam.'));
+app.listen(port, () => console.log(`Xbow Guide Bot listening at http://localhost:${port}`));
 
 
-app.get('/', (req, res) => res.send('Hello Khaldoon'));
+/*
+ * The following code is the main bot code.
+ * Here are some important definitions and includes:
+ *
+ * fs: Used to access the filesystem.
+ * discord.js: API for creating Discord bots.
+ * inlineReply: Provides a function to allow the bot to reply to messages.
+ *
+ * prefix: The command prefix. This forces users to use 'prefixCommand' to execute a command. The default value is 'g!'.
+ * guideFolder: The path of the Xbow Matchup Guides.
+ * archiveFolder: The path of the Xbow Matchup Guides Archive.
+ */
 
-app.listen(port, () => console.log(`Example app listening at http://localhost:${port}`));
-//bot code
-function getRndInteger(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
-function convertHTML(str) {
-  return str.replace(/"&apos;/g,"'")
-    .replace(/&lt;/g,"<")
-    .replace(/&gt;/g,">")
-    .replace(/&quot;/g,"'")
-    .replace(/&amp;/g,"&");
-}
-
-if (!String.prototype.decodeHTML) {
-  String.prototype.decodeHTML = function () {
-    return this.replace(/&apos;/g, "'")
-               .replace(/&quot;/g, '"')
-               .replace(/&gt;/g, '>')
-               .replace(/&lt;/g, '<')
-               .replace(/&amp;/g, '&');
-  };
-}
-
-var fetchUrl = require("fetch").fetchUrl;
-
+const fs = require('fs');
 const Discord = require('discord.js');
+require("./inlineReply");
+
+const prefix = 'g!'
+const guideFolder = './Xbow-Matchup-Guides/Guides';
+const archiveFolder = './Xbow-Matchup-Archives/Archives';
+
+
+/*
+ * Create a new Discord bot instance.
+ * Once it is ready, set the activity to aid users in knowing what the help commmand is.
+ */ 
+
 
 const Client = new Discord.Client();
 
-const prefix = 'g!'
-
-
-const queue = new Map();
-
-const ytdl = require("ytdl-core");
-require("./ExMessage");
-
 Client.once('ready', () => {
-  console.log('guide is online!');
+  console.log('Xbow Guide Bot is online!');
   Client.user.setActivity('g!help for help', { type: 'PLAYING' })
 });
 
 
-
-
-
-
-
-
-
-
+/*
+ * On every new message, do something.
+ */ 
 
 
 Client.on('message', async message => {
 
-  if(message.content.startsWith("G!"))
-  {
-    message.inlineReply("Please use 'g!'.\n");
-  }
- if (!message.content.startsWith(prefix) || message.author.bot) return;
+    /*
+     * Basic checks (such as wrong channels, bots running the commands, etc). 
+     */
 
-  args = message.content.slice(prefix.length).split(/ +/);
-  const command = args.shift().toLowerCase();
-
-
-  if(command == "help")
-  {
-    if(message.channel.id === '839839651627925544' || message.channel.id === '839927914325475338')
-    {
-      var embed = new Discord.MessageEmbed().setColor("#FF0000");
-
+    var illegalChan1id = '839839651627925544';
+    var illegalChan2id = '839927914325475338';
+    var modChannelid = '800342566041944064';
+    
+    if (!message.content.startsWith(prefix) || message.author.bot) {
+	return;
+    } else if(message.channel.id === illegalChan1id || message.channel.id === illegalChan2id) {
+	var embed = new Discord.MessageEmbed().setColor("#FF0000");
+	
         embed
             .setTitle("DON\'T USE THE BOT IN THESE CHANNELS!")
             .addFields(
                 { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
             )
             .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
-      message.inlineReply(embed);
-      Client.channels.cache.get('800342566041944064').send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
-      return;
+	message.inlineReply(embed);
+	Client.channels.cache.get(modChannelid).send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
+	return;
     }
-    
-var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
 
+
+    args = message.content.slice(prefix.length).split(/ +/);
+    const command = args.shift().toLowerCase();
+
+
+    /*
+     * Basic help menu. 
+     */
+
+    
+    if(command == "help")
+    {
+        
+	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+	
         embed
             .setTitle("Command List:")
             .addFields(
@@ -144,38 +133,30 @@ var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
             .setFooter('Xbow Guide Bot v0.4 Beta • Help Menu');
  
   
-  message.channel.send(embed);
-  }
+	message.channel.send(embed);
+    }
 
-  if(command == "invite")
-  {
-    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
 
+    /*
+     * Provide a quick and easy way to invite this bot to other servers.
+     */
+
+    
+    if(command == "invite")
+    {
+	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+	
         embed
             .setTitle("Invite Link:")
             .addFields(
                 { name: '**Invite me with this link!**', value: '[Click Here!](https://discord.com/api/oauth2/authorize?client_id=839764015567470603&permissions=511040&scope=bot)' }
             )
             .setFooter('Xbow Guide Bot v0.4 Beta • Invite Link');
-      message.channel.send(embed);
-  }
-
-  if(command == 'list')
-  {
-    if(message.channel.id === '839839651627925544' || message.channel.id === '839927914325475338')
-    {
-      var embed = new Discord.MessageEmbed().setColor("#FF0000");
-
-        embed
-            .setTitle("DON\'T USE THE BOT IN THESE CHANNELS!")
-            .addFields(
-                { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
-      message.inlineReply(embed);
-      Client.channels.cache.get('800342566041944064').send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
-      return;
+	message.channel.send(embed);
     }
+    
+    if(command == 'list')
+    {
     var guideArr = [];
 
 
@@ -317,21 +298,6 @@ console.log(data.length);
   {
 
 
-    if(message.channel.id === '839839651627925544' || message.channel.id === '839927914325475338')
-    {
-      var embed = new Discord.MessageEmbed().setColor("#FF0000");
-
-        embed
-            .setTitle("DON\'T USE THE BOT IN THESE CHANNELS!")
-            .addFields(
-                { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
-      message.inlineReply(embed);
-      Client.channels.cache.get('800342566041944064').send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
-      return;
-    }
-
 var embed = new Discord.MessageEmbed().setColor("#FF0000");
 
         embed
@@ -465,20 +431,6 @@ console.log(data.length);
 
 if(command === "find")
 {
-  if(message.channel.id === '839839651627925544' || message.channel.id === '839927914325475338')
-    {
-      var embed = new Discord.MessageEmbed().setColor("#FF0000");
-
-        embed
-            .setTitle("DON\'T USE THE BOT IN THESE CHANNELS!")
-            .addFields(
-                { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
-      message.inlineReply(embed);
-      Client.channels.cache.get('800342566041944064').send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
-      return;
-    }
 
       if (!(args instanceof Array && args.length))
     {
@@ -792,20 +744,6 @@ var name;
 
 if(command === 'license')
 {
-  if(message.channel.id === '839839651627925544' || message.channel.id === '839927914325475338')
-    {
-      var embed = new Discord.MessageEmbed().setColor("#FF0000");
-
-        embed
-            .setTitle("DON\'T USE THE BOT IN THESE CHANNELS!")
-            .addFields(
-                { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
-      message.inlineReply(embed);
-      Client.channels.cache.get('800342566041944064').send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
-      return;
-    }
 
   var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
 
