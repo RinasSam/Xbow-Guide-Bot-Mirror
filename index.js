@@ -38,27 +38,12 @@ app.get('/', (req, res) => res.send('Hello RinasSam.'));
 app.listen(port, () => console.log(`Xbow Guide Bot listening at http://localhost:${port}`));
 
 
-/*
- * The following code is the main bot code.
- * Here are some important definitions and includes:
- *
- * fs: Used to access the filesystem.
- * discord.js: API for creating Discord bots.
- * inlineReply: Provides a function to allow the bot to reply to messages.
- *
- * prefix: The command prefix. This forces users to use 'prefixCommand' to execute a command. The default value is 'g!'.
- * guideFolder: The path of the Xbow Matchup Guides.
- * archiveFolder: The path of the Xbow Matchup Guides Archive.
- */
 
+/* Important Definitions */
+require("./common.js");
 
-const fs = require('fs');
-const Discord = require('discord.js');
-require("./inlineReply");
-
-const prefix = 'g!'
-const guideFolder = './Xbow-Matchup-Guides/Guides';
-const archiveFolder = './Xbow-Matchup-Archives/Archives';
+/* Basic Commands */
+require("commands.js");
 
 
 /*
@@ -70,21 +55,17 @@ const archiveFolder = './Xbow-Matchup-Archives/Archives';
 const Client = new Discord.Client();
 
 Client.once('ready', () => {
-  console.log('Xbow Guide Bot is online!');
-  Client.user.setActivity('g!help for help', { type: 'PLAYING' })
+    console.log('Xbow Guide Bot is online!');
+    Client.user.setActivity('g!help for help', { type: 'PLAYING' })
 });
 
 
-/*
- * On every new message, do something.
- */ 
-
+/*  On every new message, do something. */
+  
 
 Client.on('message', async message => {
 
-    /*
-     * Basic checks (such as wrong channels, bots running the commands, etc). 
-     */
+    /* Basic checks (such as wrong channels, bots running the commands, etc). */
 
     var illegalChan1id = '839839651627925544';
     var illegalChan2id = '839927914325475338';
@@ -92,7 +73,9 @@ Client.on('message', async message => {
     
     if (!message.content.startsWith(prefix) || message.author.bot) {
 	return;
-    } else if(message.channel.id === illegalChan1id || message.channel.id === illegalChan2id) {
+    }
+
+    if(message.channel.id === illegalChan1id || message.channel.id === illegalChan2id) {
 	var embed = new Discord.MessageEmbed().setColor("#FF0000");
 	
         embed
@@ -100,7 +83,7 @@ Client.on('message', async message => {
             .addFields(
                 { name: 'WARNING', value: 'Please, don\'t use the bot in these channels.\nThis action will be reported to the moderators. '}
             )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
+            .setFooter(`Xbow Guide Bot ${version} • Warning`);
 	message.inlineReply(embed);
 	Client.channels.cache.get(modChannelid).send('Moderators!\n\nThis bot was used in **<#' + message.channel.id + '>** by <@' + message.author.id + '>.');
 	return;
@@ -108,58 +91,32 @@ Client.on('message', async message => {
 
 
     args = message.content.slice(prefix.length).split(/ +/);
+    
     const command = args.shift().toLowerCase();
 
 
-    /*
-     * Basic help menu. 
-     */
-
-    
-    if(command == "help")
-    {
-        
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-	
-        embed
-            .setTitle("Command List:")
-            .addFields(
-                { name: '**g!help**', value: 'Shows a list of all the commands.\n\n' },
-                { name: '**g!invite**', value: 'Get the invite link for this bot.\n\n' },
-                { name: '**g!find {what to find here}**', value: 'Finds a guide.' },
-                {name: '**g!list**', value: 'Lists available guides\n\n'},
-                { name: '**g!license**', value: 'Shows the license that the guides are licensed by.\n\n' },
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Help Menu');
- 
-  
-	message.channel.send(embed);
+    if(command === "help") {
+	displayHelp();
     }
 
-
-    /*
-     * Provide a quick and easy way to invite this bot to other servers.
-     */
-
-    
-    if(command == "invite")
-    {
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-	
-        embed
-            .setTitle("Invite Link:")
-            .addFields(
-                { name: '**Invite me with this link!**', value: '[Click Here!](https://discord.com/api/oauth2/authorize?client_id=839764015567470603&permissions=511040&scope=bot)' }
-            )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Invite Link');
-	message.channel.send(embed);
+    if(command === "invite") {
+	displayInvite();
     }
+
+    if(command === "license") {
+	displayLicense();
+    }
+
+    if(command === "info") {
+	displayInfo();
+    }
+
     
-    if(command == 'list')
+    if(command === 'list')
     {
-    var guideArr = [];
-
-
+	var guideArr = [];
+	
+	
     fs.readdirSync(guideFolder).forEach(file => {
         var guideName = file.replace('.txt', '');
         
@@ -185,7 +142,7 @@ var foundArr = guideArr;
         embed
             .setTitle("Guide List:")
             .addFields({name: `Type the guide number to display the guide; anything else to not.`, value: `${str}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Guide List');
+            .setFooter(`Xbow Guide Bot ${version} • Guide List`);
             
     message.channel.send(embed);
 //////////////////////////////////////////////////////
@@ -246,7 +203,7 @@ console.log(data.length);
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data.substring(0, index)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
       if(index4 === 0)
@@ -262,7 +219,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, data.length)}`},)
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
           console.log('fuck');
@@ -276,7 +233,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, index4)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index4+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }
       }
   }else{
@@ -285,7 +242,7 @@ console.log(data.length);
         embed
             .setTitle(name.replace('.txt', ''))
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
   }       
     return message.channel.send(embed);
     collector.stop();
@@ -294,7 +251,7 @@ console.log(data.length);
     return;
   }
 
-  if(command == 'guide')
+  if(command === 'guide')
   {
 
 
@@ -305,7 +262,7 @@ var embed = new Discord.MessageEmbed().setColor("#FF0000");
             .addFields(
                 { name: 'WARNING', value: 'The `g!guide` has been deprecated as of v0.4.\nPlease use `g!find`.\n'}
             )
-            .setFooter('Xbow Guide Bot v0.4 Beta • Warning');
+            .setFooter(`Xbow Guide Bot ${version} • Warning`);
   message.inlineReply(embed);
   return;
 
@@ -379,7 +336,7 @@ console.log(data.length);
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data.substring(0, index)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
       if(index4 === 0)
@@ -392,7 +349,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, data.length)}`},)
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
 
@@ -406,7 +363,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, index4)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index4+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }
       }
   }else{
@@ -415,7 +372,7 @@ console.log(data.length);
         embed
             .setTitle(name.replace('.txt', ''))
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
   }       
     return message.channel.send(embed);
 
@@ -570,7 +527,7 @@ console.log(data.length);
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data.substring(0, index)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
       if(index4 === 0)
@@ -583,7 +540,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, data.length)}`},)
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
 
@@ -597,7 +554,7 @@ console.log(data.length);
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, index4)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index4+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }
       }
   }else{
@@ -606,7 +563,7 @@ console.log(data.length);
         embed
             .setTitle(name.replace('.txt', ''))
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
   }       
     return message.channel.send(embed);
 }
@@ -625,7 +582,7 @@ console.log(data.length);
         embed
             .setTitle("Here is what I found:")
             .addFields({name: `Type the guide number to display the guide; anything else to not.`, value: `${str}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Guide Search');
+            .setFooter(`Xbow Guide Bot ${version} • Guide Search`);
             
 message.channel.send(embed);
 
@@ -683,7 +640,7 @@ var g;
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data.substring(0, index)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
       if(index4 === 0)
@@ -696,7 +653,7 @@ var g;
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index+1, index2)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, data.length)}`},)
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }else{
 
 
@@ -710,7 +667,7 @@ var g;
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index2+1, index3)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index3+1, index4)}`},
             {name: `\n\n‌‌‌‌‌`, value: `${data.substring(index4+1, data.length)}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
       }
       }
   }else{
@@ -719,7 +676,7 @@ var g;
         embed
             .setTitle(name.replace('.txt', ''))
             .addFields({name: `\n\n‌‌‌‌‌`, value: `${data}`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • Matchup Guide');
+            .setFooter(`Xbow Guide Bot ${version} • Matchup Guide`);
   }       
     return message.channel.send(embed);
     collector.stop();
@@ -742,29 +699,17 @@ var name;
 
 }
 
-if(command === 'license')
-{
-
-  var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-
-        embed
-            .setTitle('License')
-            .addFields(
-              {name: `\n\n‌‌‌‌‌`, value: `The Xbow matchup guides are licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License.](https://creativecommons.org/licenses/by-nc/4.0/)`})
-            .setFooter('Xbow Guide Bot v0.4 Beta • License');
-  message.inlineReply(embed);
-}
-
+        
 });
 
 
 function indexInput()
 {
-  Client.on('message', async message => {
- if (message.author.bot) return;
-
-  return message.content;
-  });
+    Client.on('message', async message => {
+	if (message.author.bot) return;
+	
+	return message.content;
+    });
 }
 
 
