@@ -43,7 +43,7 @@ app.listen(port, () => console.log(`Xbow Guide Bot listening at http://localhost
 require("./common.js");
 
 /* Basic Commands */
-require("commands.js");
+require("./commands.js");
 
 
 /*
