@@ -75,6 +75,16 @@ Client.once('ready', () => {
 });
 
 
+/* Store all guides in a single array which makes things easy to access. */
+var guideArr = [];
+    
+    
+fs.readdirSync(guideFolder).forEach(file => {
+    var guideName = file.replace('.txt', '');
+    guideArr.push(guideName);
+});
+
+
 /*
  * Here are the basic command functions the bot uses.
  * Each funtion is self explanatory (by its name and comment).
@@ -146,18 +156,98 @@ displayLicense(message)
 function
 displayInfo(message)
 {
+    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
     embed
 	.setTitle('Info')
 	.addFields(
-	    {name:`\n\n`, value: `Basic info:\n\nVersion Number: ${version}\n\nReleased by: ${author}\n\nPing: ${Date.now() - message.createdTimestamp}ms`})
+	    {name:`Version Number:`, value: `${version}`},
+	    {name: `Released by:`, value: `${author}`},
+	    {name: `Ping:`, value: `${Date.now() - message.createdTimestamp}ms`})
 	.setFooter(`Xbow Guide Bot ${version} • Info`);
     message.inlineReply(embed);
 }
 
 
+/**********************************************************************************************************************
+ * Here is where the main functions reside:
+ * findGuide: finds a guide based on a string.
+ * displayGuideList: displays a list of found guides.
+ * displayGuide: displays a guide.											
+ * ********************************************************************************************************************
+ */
+
+
+function
+findGuide(guideToFind)
+{
+    /* Check if a guide has been passed */
+    if(guideToFind === null)
+	return;
+    
+    var foundArr = [];
+    for(var i = 0; i <= 256; i++)
+    {
+	if(guideArr[i] === undefined)
+            continue;
+	
+	if(guideArr[i].toLowerCase().includes(guideToFind.toLowerCase()))
+	{
+            foundArr.push(guideArr[i]);
+	}
+    }
+
+    /*
+     * Check if any guides have been found.
+     * If not, return nothing.
+     */
+    if(foundArr.length === 0)
+	return;
+
+    return foundArr;
+}
+
+
+/* Display list of guides based upon an array. */
+function
+displayGuideList(guideList, message)
+{
+    /*
+     * If the guideList array is of 0 length, nonexistent, or is a string that says "all",
+     * set it to be equal to all the guides.
+     */
+    
+    if(guideList.length === 0 || guideList === null || guideList === "all") {
+	guideList = guideArr;
+    }
+
+    /* Store all guide names in str */
+    var str = '';
+    
+    for(var i = 0; i <= 256; i++)
+    {
+	if(guideArr[i] == null || guideArr[i] == undefined)
+	    break;
+	
+	str = str.concat(i+1 + '. ');
+	str = str.concat(guideArr[i]);
+	str = str.concat('\n');
+    }
+
+    
+    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+    
+    embed
+        .setTitle("Guide List:")
+        .addFields({name: `Type the guide number to display the guide; anything else to not.`, value: `${str}`})
+        .setFooter(`Xbow Guide Bot ${version} • Guide List`);
+    
+    message.channel.send(embed);
+
+
+}
 
 /*  On every new message, do something. */
-  
+
 
 Client.on('message', async message => {
 
@@ -210,38 +300,9 @@ Client.on('message', async message => {
     
     if(command === 'list')
     {
-	var guideArr = [];
-	
-	
-    fs.readdirSync(guideFolder).forEach(file => {
-        var guideName = file.replace('.txt', '');
-        
-        guideArr.push(guideName);
-
-      });
-
-guideArr;
-var str = '';
-
-for(var i = 0; i <= 256; i++)
-{
-  if(guideArr[i] == null || guideArr[i] == undefined)
-  {break;}
-  str = str.concat(i+1 + '. ');
-  str = str.concat(guideArr[i]);
-  str = str.concat('\n');
-}
-
+	displayGuideList("all", message);
 var foundArr = guideArr;
-        var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-
-        embed
-            .setTitle("Guide List:")
-            .addFields({name: `Type the guide number to display the guide; anything else to not.`, value: `${str}`})
-            .setFooter(`Xbow Guide Bot ${version} • Guide List`);
-            
-    message.channel.send(embed);
-//////////////////////////////////////////////////////
+        //////////////////////////////////////////////////////
 var g;
  
         console.log(foundArr.length);
@@ -484,82 +545,43 @@ console.log(data.length);
 
 if(command === "find")
 {
-
-      if (!(args instanceof Array && args.length))
-    {
-      return message.inlineReply("No guide provided");
-    }
+    var name;
+    var data;
+    var str = '';
 
     var guideToFind = args[0] + ' ';
     i = 1
     for (i; i <= 100; i++) {
       if (args[i] != undefined) {
-        guideToFind = guideToFind.concat(args[i]);
-        guideToFind = guideToFind.concat(' ');
+          guideToFind = guideToFind.concat(args[i]);
+          guideToFind = guideToFind.concat(' ');
       }
     }
     if(guideToFind == null)
-    {return;}
+	return;
     guideToFind = guideToFind.slice(0,-1);
-    console.log(guideToFind);
-  
-    var name;
-    var data;
-  
-      var guideArr = [];
+    
+    
+    var foundArr = findGuide(guideToFind);
 
+    if(!(foundArr instanceof Array && foundArr.length))
+	return message.inlineReply(`${guideToFind.replace('.txt', '')} was not found.`);
+    
+    if(foundArr.length === 0)
+	return message.inlineReply(`${guideToFind.replace('.txt', '')} was not found.`);
 
-    fs.readdirSync(guideFolder).forEach(file => {
-        var guideName = file.replace('.txt', '');
-        
-        guideArr.push(guideName);
-
-      });
-
-console.log(guideArr);
-
-var foundArr = [];
+    console.log(foundArr.length);
+    
     for(var i = 0; i <= 256; i++)
     {
-      if(guideArr[i] === undefined)
-      {
-        continue;
-      }
-      if(guideArr[i].toLowerCase().includes(guideToFind.toLowerCase()))
-      {
-          console.log( guideArr[i]);
-          foundArr.push(guideArr[i]);
-      }
+	if(foundArr[i] == null || foundArr[i] == undefined)
+	    break;
+	
+	str = str.concat(i+1 + '. ');
+	str = str.concat(foundArr[i]);
+	str = str.concat('\n');
     }
-
-console.log('Found arr\n' + foundArr);
-
-console.log(foundArr.length);
-
-
-
-var str = '';
-
-
-console.log(foundArr.length);
-
-for(var i = 0; i <= 256; i++)
-{
-  if(foundArr[i] == null || foundArr[i] == undefined)
-  {break;}
-  str = str.concat(i+1 + '. ');
-  str = str.concat(foundArr[i]);
-  str = str.concat('\n');
-}
-
-if(!(foundArr instanceof Array && foundArr.length))
-{return message.inlineReply(`${guideToFind.replace('.txt', '')} was not found.`);}
-
-if(foundArr.length === 0)
-{return message.inlineReply(`${guideToFind.replace('.txt', '')} was not found.`);}
-
-
-
+    
 
 
 //// only one guide
