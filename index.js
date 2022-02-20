@@ -70,9 +70,90 @@ const author = 'RinasSam';
 const Client = new Discord.Client();
 
 Client.once('ready', () => {
-    console.log('Xbow Guide Bot is online!');
-    Client.user.setActivity('g!help for help', { type: 'PLAYING' })
+	console.log('Xbow Guide Bot is online!');
+	Client.user.setActivity('g!help for help', { type: 'PLAYING' })
 });
+
+
+/*
+ * Here are the basic command functions the bot uses.
+ * Each funtion is self explanatory (by its name and comment).
+ */
+
+
+/* Basic help menu. */
+function
+displayHelp(message)
+{
+    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+    
+    embed
+	.setTitle("Command List:")
+        .addFields(
+                { name: '**g!help**', value: 'Shows a list of all the commands.\n\n' },
+                { name: '**g!list**', value: 'Lists available guides\n\n'},
+                { name: '**g!find {what to find here}**', value: 'Finds a guide.' },
+		{ name: '**g!info**', value: 'Shows basic information about the bot, such as version number.'},
+                { name: '**g!invite**', value: 'Get the invite link for this bot.\n\n' },
+                { name: '**g!license**', value: 'Shows the license of the bot and the guides\' license.\n\n' },
+            )
+        .setFooter(`Xbow Guide Bot ${version} • Help Menu`);
+ 
+    
+    message.channel.send(embed);
+
+}
+
+/* Provide a quick and easy way to invite this bot to other servers. */
+function
+displayInvite(message)
+{
+    
+    
+    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+    
+    embed
+        .setTitle("Invite Link:")
+        .addFields(
+            { name: '**Invite me with this link!**', value: '[Click Here!](https://discord.com/api/oauth2/authorize?client_id=839764015567470603&permissions=511040&scope=bot)' }
+        )
+        .setFooter(`Xbow Guide Bot ${version} • Invite Link`);
+    message.channel.send(embed);
+    
+}
+
+/*
+ * Show the license of the bot and the license of the guides.
+ * THE BOT LICENSE MUST NOT CHANGE, SINCE IT IS LICENSED UNDER THE AGPL ANY SUBSEQUENT VERSIONS OF IT
+ * WILL HAVE TO BE LICENSED UNDER THE AGPL AS WELL.
+ * 
+ * You can however, change the guides' license, PROVIDED THAT THE GUIDES ARE NOT THE SAME AS THE OLD ONES.
+ */
+function
+displayLicense(message)
+{
+    var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
+    
+    embed
+        .setTitle('License')
+        .addFields(
+	    {name: `\n\n‌‌‌‌‌`, value: `The Xbow Guide Bot is licensed under the [GNU Affero General Public License V3](https://www.gnu.org/licenses/agpl-3.0.en.html).\n\nThe Xbow matchup guides are licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License.](https://creativecommons.org/licenses/by-nc/4.0/)`})
+        .setFooter(`Xbow Guide Bot ${version} • License`);
+    message.inlineReply(embed);
+}
+
+/* Provide basic info on the bot. */
+function
+displayInfo(message)
+{
+    embed
+	.setTitle('Info')
+	.addFields(
+	    {name:`\n\n`, value: `Basic info:\n\nVersion Number: ${version}\n\nReleased by: ${author}\n\nPing: ${Date.now() - message.createdTimestamp}ms`})
+	.setFooter(`Xbow Guide Bot ${version} • Info`);
+    message.inlineReply(embed);
+}
+
 
 
 /*  On every new message, do something. */
@@ -80,12 +161,12 @@ Client.once('ready', () => {
 
 Client.on('message', async message => {
 
-    /* Basic checks (such as wrong channels, bots running the commands, etc). */
+    	/* Basic checks (such as wrong channels, bots running the commands, etc). */
 
     var illegalChan1id = '839839651627925544';
     var illegalChan2id = '839927914325475338';
     var modChannelid = '800342566041944064';
-    
+
     if (!message.content.startsWith(prefix) || message.author.bot) {
 	return;
     }
@@ -110,102 +191,22 @@ Client.on('message', async message => {
     const command = args.shift().toLowerCase();
 
 
-/*
- * Here are the functions used for the bot.
- * As I am very inexperienced, I have done stuff pretty inefficiently and badly.
- */	
-
-    /* Basic help menu. */
-    function
-    displayHelp()
-    {
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-
-	embed
-	    .setTitle("Command List:")
-	    .addFields(
-		    { name: '**g!help**', value: 'Shows a list of all the commands.\n\n' },
-		    { name: '**g!list**', value: 'Lists available guides\n\n'},
-		    { name: '**g!find {what to find here}**', value: 'Finds a guide.' },
-		    { name: '**g!info**', value: 'Shows basic information about the bot, such as version number.'},
-		    { name: '**g!invite**', value: 'Get the invite link for this bot.\n\n' },
-		    { name: '**g!license**', value: 'Shows the license of the bot and the guides\' license.\n\n' },
-		)
-	    .setFooter(`Xbow Guide Bot ${version} • Help Menu`);
-
-
-	message.channel.send(embed);
-
-    }
-
-    /* Provide a quick and easy way to invite this bot to other servers. */
-    function
-    displayInvite()
-    {
-	
-
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-	
-	embed
-	    .setTitle("Invite Link:")
-	    .addFields(
-		{ name: '**Invite me with this link!**', value: '[Click Here!](https://discord.com/api/oauth2/authorize?client_id=839764015567470603&permissions=511040&scope=bot)' }
-	    )
-	    .setFooter(`Xbow Guide Bot ${version} • Invite Link`);
-	message.channel.send(embed);
-	
-    }
-
-    /*
-    * Show the license of the bot and the license of the guides.
-    * THE BOT LICENSE MUST NOT CHANGE, SINCE IT IS LICENSED UNDER THE AGPL ANY SUBSEQUENT VERSIONS OF IT
-    * WILL HAVE TO BE LICENSED UNDER THE AGPL AS WELL.
-    * 
-    * You can however, change the guides' license, PROVIDED THAT THE GUIDES ARE NOT THE SAME AS THE OLD ONES.
-    */
-    function
-    displayLicense()
-    {
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-	
-	embed
-	    .setTitle('License')
-	    .addFields(
-		{name: `\n\n‌‌‌‌‌`, value: `The Xbow Guide Bot is licensed under the [GNU Affero General Public License V3](https://www.gnu.org/licenses/agpl-3.0.en.html).\n\nThe Xbow matchup guides are licensed under the [Creative Commons Attribution-NonCommercial 4.0 International License.](https://creativecommons.org/licenses/by-nc/4.0/)`})
-	    .setFooter(`Xbow Guide Bot ${version} • License`);
-	message.inlineReply(embed);
-    }
-
-    /* Provide basic info on the bot. */
-    function
-    displayInfo()
-    {
-	var embed = new Discord.MessageEmbed().setColor("#FFFFFF");
-	embed
-	    .setTitle('Info')
-	    .addFields(
-		{name:`\n\n`, value: `Basic info:\n\nVersion Number: ${version}\n\nReleased by: ${author}\n\nPing: ${Date.now() - message.createdTimestamp}ms`})
-	    .setFooter(`Xbow Guide Bot ${version} • Info`);
-	message.inlineReply(embed);
-    }
-
-
+    
     if(command === "help") {
-	displayHelp();
+	displayHelp(message);
     }
 
     if(command === "invite") {
-	displayInvite();
+	displayInvite(message);
     }
 
     if(command === "license") {
-	displayLicense();
+	displayLicense(message);
     }
 
     if(command === "info") {
-	displayInfo();
+	displayInfo(message);
     }
-
     
     if(command === 'list')
     {
